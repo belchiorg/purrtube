@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// Database schema for a video streaming service like twitch
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    String    @id @default(uuid())
+  email     String    @unique
+  username  String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  streams   Stream[]
+  messages  Message[]
+  followed  Follow[]  @relation("Followed")
+  following Follow[]  @relation("Following")
+}
+
+model Stream {
+  streamId    String   @id @default(uuid())
+  title       String
+  description String
+  category    String
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [userId])
+  chatId      String
+  chat        Chat     @relation(fields: [chatId], references: [chatId])
+  createdAt   DateTime @default(now())
+}
+
+model Chat {
+  chatId    String    @id @default(uuid())
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  streams   Stream[]
+}
+
+model Message {
+  messageId String   @id @default(uuid())
+  content   String
+  senderId  String
+  chatId    String
+  sender    User     @relation(fields: [senderId], references: [userId])
+  chat      Chat     @relation(fields: [chatId], references: [chatId])
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  followId        Int      @id @default(autoincrement())
+  followingUserId String
+  followedUserId  String
+  followingUser   User     @relation("Following", fields: [followingUserId], references: [userId])
+  followedUser    User     @relation("Followed", fields: [followedUserId], references: [userId])
+  createdAt       DateTime @default(now())
+}
