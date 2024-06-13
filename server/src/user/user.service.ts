@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { timeStamp } from 'console';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -34,6 +33,14 @@ export class UserService {
         userId: id,
       },
       data,
+    });
+  }
+
+  async findUserByUsername(username: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        username,
+      },
     });
   }
 }
