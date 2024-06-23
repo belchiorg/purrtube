@@ -1,4 +1,11 @@
-import { Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Headers,
+  HttpException,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 
@@ -11,9 +18,13 @@ export class UserController {
     return 'All users';
   }
 
-  @Get('search/:id')
-  async getUserById(@Param('id') id: string) {
-    return 'User by ' + id;
+  @Get(':username')
+  async getUserById(@Param('username') username: string) {
+    const user = await this.userService.findUserByUsername(username);
+
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    return new UserDto(user);
   }
 
   @Get('me')
@@ -22,18 +33,6 @@ export class UserController {
 
     const user = await this.userService.getMyUser(token);
 
-    const userDto: UserDto = {
-      username: user.username,
-      email: user.email,
-      creationDate: user.createdAt,
-      userId: user.userId,
-    };
-
-    return userDto;
-  }
-
-  @Post()
-  async createUser() {
-    return 'Create user';
+    return new UserDto(user);
   }
 }

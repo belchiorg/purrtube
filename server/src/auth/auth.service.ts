@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { SignInDto } from './dto/signIn.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -28,10 +33,13 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto): Promise<any> {
     if (await this.userService.findUserByUsername(signUpDto.username))
-      throw Error('Username already exists');
+      throw new HttpException(
+        'Username already in use',
+        HttpStatus.BAD_REQUEST,
+      );
 
     if (await this.userService.findUserByEmail(signUpDto.email))
-      throw Error('Email already exists');
+      throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST);
 
     //Hash the password
     const hashedPass = await bcrypt.hash(signUpDto.password, +env.SALT_ROUNDS);
