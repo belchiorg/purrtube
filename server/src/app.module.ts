@@ -8,9 +8,18 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
 import { StreamModule } from './stream/stream.module';
+import { MessageModule } from './message/message.module';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
-  imports: [AuthModule, UserModule, ConfigModule.forRoot({ isGlobal: true }), StreamModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    StreamModule,
+    MessageModule,
+    FollowModule,
+  ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService, PrismaService],
 })
